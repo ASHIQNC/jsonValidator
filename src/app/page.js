@@ -214,6 +214,44 @@ function JsonValidator({
             </pre>
           </article>
         </section>
+        <div className='mt-12 grid grid-cols-1 md:grid-cols-3 gap-6'>
+          <div className='bg-white rounded-lg shadow-md p-6 text-center'>
+            <div className='w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+              <i className='fas fa-check-double text-blue-600 text-xl'></i>
+            </div>
+            <h3 className='text-lg font-semibold text-gray-800 mb-2'>
+              Instant Validation
+            </h3>
+            <p className='text-gray-600 text-sm'>
+              Quickly validate your JSON and get detailed error messages
+            </p>
+          </div>
+
+          <div className='bg-white rounded-lg shadow-md p-6 text-center'>
+            <div className='w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+              <i className='fas fa-magic text-green-600 text-xl'></i>
+            </div>
+            <h3 className='text-lg font-semibold text-gray-800 mb-2'>
+              Auto Formatting
+            </h3>
+            <p className='text-gray-600 text-sm'>
+              Automatically format and beautify your JSON with proper
+              indentation
+            </p>
+          </div>
+
+          <div className='bg-white rounded-lg shadow-md p-6 text-center'>
+            <div className='w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+              <i className='fas fa-copy text-purple-600 text-xl'></i>
+            </div>
+            <h3 className='text-lg font-semibold text-gray-800 mb-2'>
+              Easy Copy
+            </h3>
+            <p className='text-gray-600 text-sm'>
+              One-click copy to clipboard for formatted JSON output
+            </p>
+          </div>
+        </div>
 
         {/* Footer */}
         <footer className='mt-12 text-center text-gray-500 text-sm select-none'>
