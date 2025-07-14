@@ -4,7 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 /**
- * Production‑ready JSON validator & formatter component (plain JavaScript).
+
  *
  * Props:
  *  - defaultValue: initial JSON string (optional)
@@ -202,7 +202,6 @@ function JsonValidator({
               </div>
             )}
 
-            {/* Output */}
             <pre
               id='json-output'
               className={`w-full ${areaHeightClass} p-4 border border-gray-300 rounded-md font-mono text-sm bg-gray-50 overflow-auto whitespace-pre-wrap`}
