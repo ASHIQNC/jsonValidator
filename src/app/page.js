@@ -1,103 +1,228 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
+
+/**
+ * Production‑ready JSON validator & formatter component (plain JavaScript).
+ *
+ * Props:
+ *  - defaultValue: initial JSON string (optional)
+ *  - placeholder: textarea placeholder (optional)
+ *  - areaHeightClass: Tailwind height class for the textareas (default "h-80")
+ */
+function JsonValidator({
+  defaultValue = '',
+  placeholder = 'Paste your JSON here…',
+  areaHeightClass = 'h-100',
+}) {
+  const [input, setInput] = useState(defaultValue);
+  const [output, setOutput] = useState('');
+  const [error, setError] = useState('');
+  const [isValid, setIsValid] = useState(null);
+
+  // Reset all UI state
+  const clearAll = useCallback(() => {
+    setInput('');
+    setOutput('');
+    setError('');
+    setIsValid(null);
+  }, []);
+
+  // Validate the input string and pretty‑print if valid
+  const validateAndFormat = useCallback(() => {
+    if (!input.trim()) {
+      setError('Please enter some JSON to validate.');
+      setOutput('');
+      setIsValid(null);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(input);
+      const formatted = JSON.stringify(parsed, null, 2);
+      setOutput(formatted);
+      setError('');
+      setIsValid(true);
+    } catch (err) {
+      setOutput('');
+      setIsValid(false);
+      setError(
+        err instanceof Error ? err.message : 'Unknown error while parsing JSON.'
+      );
+    }
+  }, [input]);
+
+  // Copy formatted JSON to clipboard with fallback & notification
+  const copyToClipboard = useCallback(async () => {
+    try {
+      if (!output) {
+        toast.error('Nothing to copy.');
+        return;
+      }
+
+      if (!navigator.clipboard) {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = output;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } else {
+        await navigator.clipboard.writeText(output);
+      }
+
+      toast.success('Copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      toast.error('Copy failed. Please copy manually.');
+    }
+  }, [output]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter'>
+      <div className='container mx-auto px-4 py-8 max-w-6xl'>
+        {/* Header */}
+        <header className='text-center mb-8 select-none'>
+          <h1 className='text-4xl font-bold text-gray-800 mb-2'>
+            JSON Validator &amp; Formatter
+          </h1>
+          <p className='text-gray-600 text-lg'>
+            Validate, format, and beautify your JSON data instantly
+          </p>
+        </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Main */}
+        <section className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+          {/* Input */}
+          <article
+            className='bg-white rounded-lg shadow-lg p-6'
+            aria-label='JSON input panel'
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold text-gray-800'>
+                <i
+                  className='fas fa-edit mr-2 text-blue-500'
+                  aria-hidden='true'
+                />{' '}
+                Input JSON
+              </h2>
+              <button
+                type='button'
+                onClick={clearAll}
+                className='px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md shadow-sm transition-colors'
+              >
+                <i className='fas fa-trash mr-1' aria-hidden='true' /> Clear
+              </button>
+            </div>
+
+            <label htmlFor='json-input' className='sr-only'>
+              JSON input textarea
+            </label>
+            <textarea
+              id='json-input'
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={placeholder}
+              className={`w-full ${areaHeightClass} p-4 border border-gray-300 rounded-md font-mono text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none`}
+              spellCheck={false}
+              autoComplete='off'
+              autoCorrect='off'
+              autoCapitalize='off'
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+            <button
+              type='button'
+              onClick={validateAndFormat}
+              className='w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-md transition-colors'
+            >
+              <i className='fas fa-check-circle mr-2' aria-hidden='true' />{' '}
+              Validate &amp; Format JSON
+            </button>
+          </article>
+
+          {/* Output */}
+          <article
+            className='bg-white rounded-lg shadow-lg p-6'
+            aria-label='Formatted JSON output panel'
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold text-gray-800'>
+                <i
+                  className='fas fa-code mr-2 text-green-500'
+                  aria-hidden='true'
+                />{' '}
+                Formatted Output
+              </h2>
+              <button
+                type='button'
+                onClick={copyToClipboard}
+                disabled={!output}
+                className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                  output
+                    ? 'bg-green-100 hover:bg-green-200 text-green-700'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <i className='fas fa-copy mr-1' aria-hidden='true' /> Copy
+              </button>
+            </div>
+
+            {/* Validation status */}
+            {isValid !== null && (
+              <div
+                role='status'
+                className={`mb-4 p-3 rounded-md ${
+                  isValid
+                    ? 'bg-green-50 border border-green-200 text-green-800'
+                    : 'bg-red-50 border border-red-200 text-red-800'
+                }`}
+              >
+                <i
+                  className={`fas ${
+                    isValid
+                      ? 'fa-check-circle text-green-500'
+                      : 'fa-times-circle text-red-500'
+                  } mr-2`}
+                  aria-hidden='true'
+                />
+                {isValid ? 'Valid JSON' : 'Invalid JSON'}
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className='mb-4 p-4 bg-red-50 border border-red-200 rounded-md overflow-auto'>
+                <p className='text-red-800 text-sm font-mono break-all'>
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {/* Output */}
+            <pre
+              id='json-output'
+              className={`w-full ${areaHeightClass} p-4 border border-gray-300 rounded-md font-mono text-sm bg-gray-50 overflow-auto whitespace-pre-wrap`}
+            >
+              {output || (
+                <span className='text-gray-400 italic'>
+                  Formatted JSON will appear here…
+                </span>
+              )}
+            </pre>
+          </article>
+        </section>
+
+        {/* Footer */}
+        <footer className='mt-12 text-center text-gray-500 text-sm select-none'>
+          © {new Date().getFullYear()} ASR. All rights reserved.
+        </footer>
+      </div>
+    </main>
   );
 }
+
+export default JsonValidator;
