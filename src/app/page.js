@@ -88,7 +88,7 @@ function JsonValidator({
         {/* Header */}
         <header className='text-center mb-8 select-none'>
           <h1 className='text-4xl font-bold text-gray-800 mb-2'>
-            JSON Validator &amp; Formatter
+            ASR JSON Validator &amp; Formatter
           </h1>
           <p className='text-gray-600 text-lg'>
             Validate, format, and beautify your JSON data instantly
@@ -161,7 +161,7 @@ function JsonValidator({
                 type='button'
                 onClick={copyToClipboard}
                 disabled={!output}
-                className={`px-4 py-2 text-sm rounded-md transition-colors ${
+                className={` cursor-pointer px-4 py-2 text-sm rounded-md transition-colors ${
                   output
                     ? 'bg-green-100 hover:bg-green-200 text-green-700'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
